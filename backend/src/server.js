@@ -10,11 +10,18 @@ dotenv.config();
 
 const app = express();
 
-app.use(
-  cors({
-    origin: [process.env.WEB_ORIGIN, "http://localhost:5173"].filter(Boolean),
-  })
-);
+const allowedOrigins = [
+  process.env.WEB_ORIGIN,
+  "http://localhost:5173"
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  }
+}));
 
 app.use(express.json({ limit: "1mb" }));
 
@@ -31,7 +38,8 @@ const port = Number(process.env.PORT || 4000);
 async function start() {
   await initDb();
   app.listen(port, () => {
-    console.log(`Backend running on http://localhost:${port}`);
+    console.log(`Backend running on port ${port}`);
+    console.log("Allowed origins:", allowedOrigins);
   });
 }
 
