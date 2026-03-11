@@ -6,7 +6,7 @@
   "host_permissions": [
     "https://usps-board.sean.yukla.org/*",
     "https://api.telegram.org/*",
-    "http://localhost:4000/*"
+    "https://usps-jgp7.onrender.com/*"
   ],
   "background": {
     "service_worker": "background.js"

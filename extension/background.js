@@ -2,7 +2,7 @@ const PLATFORM_URL_PATTERNS = [
   "https://usps-board.sean.yukla.org/*"
 ];
 
-const BACKEND_URL = "http://localhost:4000/api/ingest";
+const BACKEND_URL = "https://usps-jgp7.onrender.com/api/ingest";
 const INGEST_API_KEY = "super_ingest_key_2026";
 
 const KEY_SEEN = "seenLoadFingerprints";
