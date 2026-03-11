@@ -1,7 +1,5 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge } = require("electron");
 
 contextBridge.exposeInMainWorld("desktopAPI", {
-  onFeed(callback) {
-    ipcRenderer.on("feed", (_, payload) => callback(payload));
-  }
+  isElectron: true
 });
