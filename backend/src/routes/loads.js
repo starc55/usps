@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
     const status = (req.query.status || "").trim();
     const limit = Math.min(Number(req.query.limit || 100), 500);
 
-    const conditions = [];
+    const conditions = [`created_at >= NOW() - INTERVAL '30 minutes'`];
     const values = [];
     let i = 1;
 
@@ -33,14 +33,13 @@ router.get("/", async (req, res) => {
       i += 1;
     }
 
-    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
     values.push(limit);
 
     const result = await pool.query(
       `
       SELECT *
       FROM loads
-      ${where}
+      WHERE ${conditions.join(" AND ")}
       ORDER BY created_at DESC
       LIMIT $${i};
       `,
