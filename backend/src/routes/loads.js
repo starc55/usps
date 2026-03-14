@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
     const status = (req.query.status || "").trim();
     const limit = Math.min(Number(req.query.limit || 100), 500);
 
-    const conditions = [`created_at >= NOW() - INTERVAL '30 minutes'`];
+    const conditions = [`(expires_at IS NULL OR expires_at > NOW())`];
     const values = [];
     let i = 1;
 

@@ -22,6 +22,16 @@ function buildFingerprint(load) {
   ].join("::");
 }
 
+function parseEndsInMinutes(value) {
+  const text = cleanText(value).toLowerCase();
+  if (!text) return 30;
+
+  const match = text.match(/(\d+)/);
+  if (!match) return 30;
+
+  return Number(match[1]);
+}
+
 router.post("/", async (req, res) => {
   try {
     const apiKey = req.headers["x-ingest-key"];
@@ -63,6 +73,7 @@ router.post("/", async (req, res) => {
       }
 
       const fingerprint = buildFingerprint(load);
+      const endsInMinutes = parseEndsInMinutes(load.endsIn);
 
       const query = `
         INSERT INTO loads (
@@ -76,9 +87,10 @@ router.post("/", async (req, res) => {
           status,
           pickup_full,
           delivery_full,
-          fingerprint
+          fingerprint,
+          expires_at
         )
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, NOW() + ($12 || ' minutes')::interval)
         ON CONFLICT (fingerprint) DO NOTHING
         RETURNING *;
       `;
@@ -95,6 +107,7 @@ router.post("/", async (req, res) => {
         load.pickupFull,
         load.deliveryFull,
         fingerprint,
+        String(endsInMinutes || 30),
       ];
 
       const result = await pool.query(query, values);

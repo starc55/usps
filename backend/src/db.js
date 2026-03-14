@@ -8,8 +8,8 @@ const { Pool } = pg;
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 export async function initDb() {
@@ -28,12 +28,22 @@ export async function initDb() {
       delivery_full TEXT DEFAULT '',
       fingerprint TEXT NOT NULL UNIQUE,
       first_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      expires_at TIMESTAMPTZ
     );
   `);
 
   await pool.query(`
+    ALTER TABLE loads
+    ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
+  `);
+
+  await pool.query(`
     CREATE INDEX IF NOT EXISTS idx_loads_created_at ON loads (created_at DESC);
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_loads_expires_at ON loads (expires_at);
   `);
 
   await pool.query(`
